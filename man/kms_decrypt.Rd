@@ -7,12 +7,18 @@
 kms_decrypt(cipher)
 }
 \arguments{
-\item{cipher}{base64-encoded ciphertext}
+\item{cipher}{Base64-encoded ciphertext}
 }
 \value{
-string
+decrypted text
 }
 \description{
 Decrypt cipher into plain text via KMS
+}
+\references{
+\url{http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/kms/AWSKMSClient.html#decrypt-com.amazonaws.services.kms.model.DecryptRequest-}
+}
+\seealso{
+kms_encrypt
 }
 

@@ -7,12 +7,12 @@
 kms_encrypt(key, text)
 }
 \arguments{
-\item{key}{KMS key ID, fully specified Amazon Resource Name or an alias with the \code{alias/} prefix}
+\item{key}{the KMS customer master key identifier as a fully specified Amazon Resource Name (eg \code{arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012}) or an alias with the \code{alias/} prefix (eg \code{alias/foobar})}
 
-\item{text}{max 4096 bytes long string}
+\item{text}{max 4096 bytes long character vector, eg an RSA key, a database password, or other sensitive customer information}
 }
 \value{
-base64-encoded text
+Base64-encoded text
 }
 \description{
 Encrypt plain text via KMS
@@ -21,5 +21,11 @@ Encrypt plain text via KMS
 \dontrun{
 kms_encrypt('alias/mykey', 'foobar')
 }
+}
+\references{
+\url{http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/kms/AWSKMSClient.html#encrypt-com.amazonaws.services.kms.model.EncryptRequest-}
+}
+\seealso{
+kms_decrypt
 }
 

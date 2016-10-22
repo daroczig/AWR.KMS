@@ -7,4 +7,7 @@
 \description{
 This is a simple wrapper around the most important features of the related Java SDK.
 }
+\references{
+\url{http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/kms/AWSKMSClient.html}
+}
 
