@@ -2,6 +2,7 @@
 
 export(kms_decrypt)
 export(kms_encrypt)
+export(kms_generate_data_key)
 import(AWR)
 importFrom(jsonlite,base64_dec)
 importFrom(jsonlite,base64_enc)

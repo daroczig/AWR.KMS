@@ -22,7 +22,7 @@ This R package relies on the `jar` files bundled with the [AWR package](https://
 
 ## What is it good for?
 
-Currently, only two basic, but very important features are supported:
+Currently, only three basic, but very important features are supported:
 
 * you can encrypt up to 4 KB of arbitrary data such as an RSA key, a database password, or other sensitive customer information and Base64-encode it to be stored somewhere:
 
@@ -39,15 +39,30 @@ Currently, only two basic, but very important features are supported:
 [1] "foobar"
 ```
 
+* generate a data encryption key (see below for a use case):
+
+```r
+> kms_generate_data_key('alias/mykey')
+$cipher
+[1] "Base-64 encoded, encrypted data encryption key"
+
+$key
+[1] "alias/mykey"
+
+$text
+[1] "Base-64 encoded data encryption key"
+
+```
+
 ## How can I encrypt data larger than 4KB?
 
 Use [envelope encryption](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#enveloping). In short, you can:
 
-* generate a new encryption key and store it only in memory for the next 2 steps
+* generate a new (data) encryption key (eg with `kms_generate_data_key`) and store it only in memory for the next 2 steps
 * use this new encryption key to encrypt the data locally
-* encrypt the encryption key via KMS and store the encrypted key on disk along with the encrypted data
+* encrypt the encryption key via KMS and store the encrypted (data encryption) key on disk along with the encrypted data
 * clean up the encryption key from memory
-* if you want to decrypt the data, decrypt the encrypted encryption key via KMS, than decrypt the data with the decrypted encryption key stored in memory
+* if you want to decrypt the data, decrypt the encrypted (data encryption) key via KMS, than decrypt the data with the decrypted (data encryption) key stored in memory
 
 ## What if I want to do other cool things with KMS and R?
 
