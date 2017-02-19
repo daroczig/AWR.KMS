@@ -12,7 +12,7 @@ kms_generate_data_key(key, bytes = 64L)
 \item{bytes}{the required length of the data encryption key in bytes (so provide eg \code{64L} for a 512-bit key)}
 }
 \value{
-\code{list} of the generated Base64-encoded data encryption key, Base64-encoded encrypted version of the key using the \code{key} KMS customer master key
+\code{list} of the Base64-encoded encrypted version of the data encryption key (to be stored on disk), the \code{raw} object of the encryption key and the KMS customer master key used to generate this object
 }
 \description{
 Generate a data encryption key for envelope encryption

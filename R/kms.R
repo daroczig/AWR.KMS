@@ -47,7 +47,7 @@ kms_decrypt <- function(cipher) {
 
 #' Generate a data encryption key for envelope encryption
 #' @param bytes the required length of the data encryption key in bytes (so provide eg \code{64L} for a 512-bit key)
-#' @return \code{list} of the generated Base64-encoded data encryption key, Base64-encoded encrypted version of the key using the \code{key} KMS customer master key
+#' @return \code{list} of the Base64-encoded encrypted version of the data encryption key (to be stored on disk), the \code{raw} object of the encryption key and the KMS customer master key used to generate this object
 #' @inheritParams kms_encrypt
 #' @export
 #' @references \url{http://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html}
@@ -62,10 +62,10 @@ kms_generate_data_key <- function(key, bytes = 64L) {
     client <- .jnew('com.amazonaws.services.kms.AWSKMSClient')
     res <- client$generateDataKey(req)
 
-    ## return cypher + plan text
+    ## return cypher + plain text
     list(
-        cipher = base64_enc(as.raw(res$getCiphertextBlob()$array())),
+        cipher = base64_enc(res$getCiphertextBlob()$array()),
         key    = res$getKeyId(),
-        text   = base64_enc(as.raw(res$getPlaintext()$array())))
+        text   = res$getPlaintext()$array())
 
 }

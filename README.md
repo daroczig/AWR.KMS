@@ -59,10 +59,37 @@ $text
 Use [envelope encryption](http://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#enveloping). In short, you can:
 
 * generate a new (data) encryption key (eg with `kms_generate_data_key`) and store it only in memory for the next 2 steps
-* use this new encryption key to encrypt the data locally
+* use this new encryption key to encrypt the data locally (eg using the `sodium` package or the `AES` function from the `digest` package)
 * encrypt the encryption key via KMS and store the encrypted (data encryption) key on disk along with the encrypted data
 * clean up the encryption key from memory
 * if you want to decrypt the data, decrypt the encrypted (data encryption) key via KMS, than decrypt the data with the decrypted (data encryption) key stored in memory
+
+A simple implementation:
+
+```r
+## let's say we want to encrypt the mtcars dataset stored in JSON
+library(jsonlite)
+data <- toJSON(mtcars)
+
+## generate a 256-bit data encryption key (that's supported by digest::AES)
+library(AWR.KMS)
+key <- kms_generate_data_key('alias/mykey', byte = 32L)
+
+## convert the JSON to raw so that we can use that with digest::AES
+raw <- charToRaw(data)
+## the text length must be a multiple of 16 bytes
+## https://github.com/sdoyen/r_password_crypt/blob/master/crypt.R
+raw <- c(raw, as.raw(rep(0, 16 - length(raw) %% 16)))
+
+## encrypt the raw object with the new key + digest::AES
+## the resulting text and the encrypted key can be stored on disk
+library(digest)
+aes <- AES(key$text)
+base64_enc(aes$encrypt(raw))
+
+## decrypt the above returned ciphertext using the decrypted key
+rawToChar(aes$decrypt(base64_dec(...), raw = TRUE))
+```
 
 ## What if I want to do other cool things with KMS and R?
 
