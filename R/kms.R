@@ -8,15 +8,16 @@
 #' kms_encrypt('alias/mykey', 'foobar')
 #' }
 #' @seealso kms_decrypt
+#'
 kms_encrypt <- function(key, text) {
 
     ## prepare the request
-    req <- .jnew("com.amazonaws.services.kms.model.EncryptRequest")
+    req <- .jnew('com.amazonaws.services.kms.model.EncryptRequest')
     req$setKeyId(key)
     req$setPlaintext(J('java.nio.ByteBuffer')$wrap(.jbyte(charToRaw(as.character(text)))))
 
     ## send to AWS
-    client <- .jnew("com.amazonaws.services.kms.AWSKMSClient")
+    client <- .jnew('com.amazonaws.services.kms.AWSKMSClient')
     cipher <- client$encrypt(req)$getCiphertextBlob()$array()
 
     ## encode and return
@@ -34,11 +35,11 @@ kms_encrypt <- function(key, text) {
 kms_decrypt <- function(cipher) {
 
     ## prepare the request
-    req <- .jnew("com.amazonaws.services.kms.model.DecryptRequest")
+    req <- .jnew('com.amazonaws.services.kms.model.DecryptRequest')
     req$setCiphertextBlob(J('java.nio.ByteBuffer')$wrap(.jbyte(base64_dec(cipher))))
 
     ## send to AWS
-    client <- .jnew("com.amazonaws.services.kms.AWSKMSClient")
+    client <- .jnew('com.amazonaws.services.kms.AWSKMSClient')
     rawToChar(client$decrypt(req)$getPlaintext()$array())
 
 }

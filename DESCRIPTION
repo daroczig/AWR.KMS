@@ -1,13 +1,14 @@
 Type: Package
-Package: kmR
+Package: AWR.KMS
 Maintainer: Gergely Daroczi <gergely.daroczi@card.com>
 Author: Gergely Daroczi <gergely.daroczi@card.com>
 Title: A Simple Client to the 'AWS' Key Management Service
-Description: Encrypt plain text and 'decrypt' cipher text via 'KMS'.
+Description: Encrypt plain text and 'decrypt' cipher text using encryption keys hosted at Amazon Web Services ('AWS') Key Management Service ('KMS'), on which See <https://aws.amazon.com/kms> for more information.
 Version: 0.1
-Date: 2016-12-05
-URL: https://github.com/cardcorp/kmR
+Date: 2017-02-19
+URL: https://github.com/cardcorp/AWR.KMS
 License: AGPL-3
 Imports:
-    jsonlite,
-    rJava
+    AWR,
+    rJava,
+    jsonlite
