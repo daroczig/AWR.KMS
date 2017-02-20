@@ -9,7 +9,7 @@ This an R client to interact with the [AWS Key Management Service](https://aws.a
 The package is hosted on [CRAN](https://cran.r-project.org/package=AWR.KMS), so installation is as easy as:
 
 ```r
-install.packages('AWR')
+install.packages('AWR.KMS')
 ```
 
 But you can similarly easily install the most recent development version of the R package as well:
