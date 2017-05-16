@@ -1,7 +1,7 @@
 Type: Package
 Package: AWR.KMS
-Maintainer: Gergely Daroczi <gergely.daroczi@card.com>
-Author: Gergely Daroczi <gergely.daroczi@card.com>
+Maintainer: Gergely Daroczi <daroczig@rapporter.net>
+Author: Gergely Daroczi <daroczig@rapporter.net>
 Title: A Simple Client to the 'AWS' Key Management Service
 Description: Encrypt plain text and 'decrypt' cipher text using encryption keys
     hosted at Amazon Web Services ('AWS') Key Management Service ('KMS'), on which
