@@ -6,7 +6,7 @@ Title: A Simple Client to the 'AWS' Key Management Service
 Description: Encrypt plain text and 'decrypt' cipher text using encryption keys
     hosted at Amazon Web Services ('AWS') Key Management Service ('KMS'), on which
     see <https://aws.amazon.com/kms> for more information.
-Version: 0.1
+Version: 0.1.1
 Date: 2017-02-19
 URL: https://github.com/cardcorp/AWR.KMS
 License: AGPL-3
