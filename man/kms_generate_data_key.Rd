@@ -20,4 +20,3 @@ Generate a data encryption key for envelope encryption
 \references{
 \url{http://docs.aws.amazon.com/kms/latest/APIReference/API_GenerateDataKey.html}
 }
-

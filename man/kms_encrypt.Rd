@@ -28,4 +28,3 @@ kms_encrypt('alias/mykey', 'foobar')
 \seealso{
 kms_decrypt
 }
-

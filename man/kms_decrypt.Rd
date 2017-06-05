@@ -21,4 +21,3 @@ Decrypt cipher into plain text via KMS
 \seealso{
 kms_encrypt
 }
-
