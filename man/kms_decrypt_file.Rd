@@ -4,10 +4,12 @@
 \alias{kms_decrypt_file}
 \title{Decrypt file via KMS}
 \usage{
-kms_decrypt_file(file)
+kms_decrypt_file(file, return = file)
 }
 \arguments{
 \item{file}{base file path (without the \code{enc} or \code{key} suffix)}
+
+\item{return}{where to place the encrypted file (defaults to \code{file})}
 }
 \value{
 decrypted file path

@@ -137,11 +137,12 @@ kms_encrypt_file <- function(key, file) {
 
 #' Decrypt file via KMS
 #' @param file base file path (without the \code{enc} or \code{key} suffix)
+#' @param return where to place the encrypted file (defaults to \code{file})
 #' @return decrypted file path
 #' @export
 #' @seealso kms_encrypt kms_encrypt_file
 #' @importFrom digest AES
-kms_decrypt_file <- function(file) {
+kms_decrypt_file <- function(file, return = file) {
 
     if (!file.exists(paste0(file, '.enc'))) {
         stop(paste('Encrypted file does not exist:', paste0(file, '.enc')))
@@ -149,8 +150,8 @@ kms_decrypt_file <- function(file) {
     if (!file.exists(paste0(file, '.key'))) {
         stop(paste('Encryption key does not exist:', paste0(file, '.key')))
     }
-    if (file.exists(file)) {
-        stop(paste('Encrypted file already exists:', file))
+    if (file.exists(return)) {
+        stop(paste('Encrypted file already exists:', return))
     }
 
     ## load the encryption key
@@ -164,9 +165,9 @@ kms_decrypt_file <- function(file) {
     msg <- aes$decrypt(msg, raw = TRUE)
 
     ## remove extra zeros added due to 16 bytes rule
-    writeBin(msg[msg > 0], file)
+    writeBin(msg[msg > 0], return)
 
     ## return file paths
-    file
+    return
 
 }
