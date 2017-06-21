@@ -73,7 +73,7 @@ kms_decrypt <- function(cipher, return = c('string', 'raw')) {
 
     ## return as requested
     if (return == 'string') {
-        rawToChar(res)
+        res <- rawToChar(res)
     }
     res
 
