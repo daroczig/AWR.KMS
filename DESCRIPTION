@@ -13,5 +13,6 @@ License: AGPL-3
 Imports:
     AWR,
     rJava,
-    jsonlite
+    jsonlite,
+    futile.logger
 RoxygenNote: 6.0.1

@@ -1,3 +1,31 @@
+#' Retry the query up to 3 times on failure and if AWS reports it's a retryable error
+#' @param cmd expression
+#' @param retries number of previous retries
+#' @keywords internal
+#' @importFrom futile.logger flog.error
+retry <- function(cmd, retries = 0) {
+
+    cmd <- substitute(cmd)
+    res <- tryCatch(eval(cmd, envir = parent.frame()), error = function(e) e)
+
+    mc <- match.call()
+    if (is.null(mc$retries)) mc$retries <- 0
+    mc$retries <- mc$retries + 1
+    if (mc$retries > 10) {
+        stop('Giving up')
+    }
+
+    if (inherits(res, 'error') && res$isRetryable()) {
+        flog.error('Retrying query due to temporary AWS error: %s', res$message)
+        Sys.sleep(2 + (mc$retries - 1) * 10)
+        res <- eval(mc, envir = parent.frame())
+    }
+
+    res
+
+}
+
+
 #' Encrypt plain text via KMS
 #' @param key the KMS customer master key identifier as a fully specified Amazon Resource Name (eg \code{arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012}) or an alias with the \code{alias/} prefix (eg \code{alias/foobar})
 #' @param text max 4096 bytes long character vector, eg an RSA key, a database password, or other sensitive customer information
@@ -17,7 +45,7 @@ kms_encrypt <- function(key, text) {
     req$setPlaintext(J('java.nio.ByteBuffer')$wrap(.jbyte(charToRaw(as.character(text)))))
 
     ## send to AWS
-    cipher <- kms_client()$encrypt(req)$getCiphertextBlob()$array()
+    cipher <- retry(kms_client()$encrypt(req))$getCiphertextBlob()$array()
 
     ## encode and return
     base64_enc(cipher)
@@ -38,7 +66,7 @@ kms_decrypt <- function(cipher) {
     req$setCiphertextBlob(J('java.nio.ByteBuffer')$wrap(.jbyte(base64_dec(cipher))))
 
     ## send to AWS
-    rawToChar(kms_client()$decrypt(req)$getPlaintext()$array())
+    rawToChar(retry(kms_client()$decrypt(req))$getPlaintext()$array())
 
 }
 
@@ -57,7 +85,7 @@ kms_generate_data_key <- function(key, bytes = 64L) {
     req$setNumberOfBytes(.jnew('java/lang/Integer', bytes))
 
     ## send to AWS
-    res <- kms_client()$generateDataKey(req)
+    res <- retry(kms_client()$generateDataKey(req))
 
     ## return cypher + plain text
     list(
