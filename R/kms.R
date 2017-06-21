@@ -94,3 +94,79 @@ kms_generate_data_key <- function(key, bytes = 64L) {
         text   = res$getPlaintext()$array())
 
 }
+
+
+#' Encrypt file via KMS
+#' @param key the KMS customer master key identifier as a fully specified Amazon Resource Name (eg \code{arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012}) or an alias with the \code{alias/} prefix (eg \code{alias/foobar})
+#' @param file file path
+#' @return two files created with \code{enc} (encrypted data) and \code{key} (encrypted key) extensions
+#' @export
+#' @seealso kms_encrypt kms_decrypt_file
+#' @importFrom digest AES
+kms_encrypt_file <- function(key, file) {
+
+    if (!file.exists(file)) {
+        stop(paste('File does not exist:', file))
+    }
+
+    ## load the file to be encrypted
+    msg <- readBin(file, 'raw', n = file.size(file))
+    ## the text length must be a multiple of 16 bytes
+    ## https://github.com/sdoyen/r_password_crypt/blob/master/crypt.R
+    msg <- c(msg, as.raw(rep(0, 16 - length(msg) %% 16)))
+
+    ## generate encryption key
+    key <- kms_generate_data_key(key, bytes = 32L)
+
+    ## encrypt file using the encryption key
+    aes <- AES(key$text, mode = 'ECB')
+    writeBin(aes$encrypt(msg), paste0(file, '.enc'))
+
+    ## store encrypted key
+    cat(key$cipher, file = paste0(file, '.key'))
+
+    ## return file paths
+    list(
+        file = file,
+        encrypted = paste0(file, '.enc'),
+        key = paste0(file, '.key')
+    )
+
+}
+
+
+#' Decrypt file via KMS
+#' @param file base file path (without the \code{enc} or \code{key} suffix)
+#' @return decrypted file path
+#' @export
+#' @seealso kms_encrypt kms_encrypt_file
+#' @importFrom digest AES
+kms_decrypt_file <- function(file) {
+
+    if (!file.exists(paste0(file, '.enc'))) {
+        stop(paste('Encrypted file does not exist:', paste0(file, '.enc')))
+    }
+    if (!file.exists(paste0(file, '.key'))) {
+        stop(paste('Encryption key does not exist:', paste0(file, '.key')))
+    }
+    if (file.exists(file)) {
+        stop(paste('Encrypted file already exists:', file))
+    }
+
+    ## load the encryption key
+    key <- charToRaw(kms_decrypt(readLines(paste0(file, '.key'), warn = FALSE)))
+
+    ## load the encrypted file
+    msg <- readBin(paste0(file, '.enc'), 'raw', n = file.size(paste0(file, '.enc')))
+
+    ## decrypt the file using the encryption key
+    aes <- AES(key, mode = 'ECB')
+    msg <- aes$decrypt(msg, raw = TRUE)
+
+    ## remove extra zeros added due to 16 bytes rule
+    writeBin(msg[msg > 0], file)
+
+    ## return file paths
+    file
+
+}
