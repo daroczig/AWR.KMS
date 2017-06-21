@@ -55,18 +55,27 @@ kms_encrypt <- function(key, text) {
 
 #' Decrypt cipher into plain text via KMS
 #' @param cipher Base64-encoded ciphertext
-#' @return decrypted text
+#' @param return return format
+#' @return decrypted text as string or raw
 #' @export
 #' @references \url{http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/kms/AWSKMSClient.html#decrypt-com.amazonaws.services.kms.model.DecryptRequest-}
 #' @seealso kms_encrypt
-kms_decrypt <- function(cipher) {
+kms_decrypt <- function(cipher, return = c('string', 'raw')) {
+
+    return <- match.arg(return)
 
     ## prepare the request
     req <- .jnew('com.amazonaws.services.kms.model.DecryptRequest')
     req$setCiphertextBlob(J('java.nio.ByteBuffer')$wrap(.jbyte(base64_dec(cipher))))
 
     ## send to AWS
-    rawToChar(retry(kms_client()$decrypt(req))$getPlaintext()$array())
+    res <- retry(kms_client()$decrypt(req))$getPlaintext()$array()
+
+    ## return as requested
+    if (return == 'string') {
+        rawToChar(res)
+    }
+    res
 
 }
 
@@ -114,7 +123,7 @@ kms_encrypt_file <- function(key, file) {
     ## the text length must be a multiple of 16 bytes
     ## so let's Base64-encode just in case
     msg <- charToRaw(base64_enc(msg))
-    msg <- c(msg, as.raw(rep(charToRaw('='), 16 - length(msg) %% 16)))
+    msg <- c(msg, as.raw(rep(as.raw(0), 16 - length(msg) %% 16)))
 
     ## generate encryption key
     key <- kms_generate_data_key(key, bytes = 32L)
@@ -156,7 +165,7 @@ kms_decrypt_file <- function(file, return = file) {
     }
 
     ## load the encryption key
-    key <- charToRaw(kms_decrypt(readLines(paste0(file, '.key'), warn = FALSE)))
+    key <- kms_decrypt(readLines(paste0(file, '.key'), warn = FALSE), return = 'raw')
 
     ## load the encrypted file
     msg <- readBin(paste0(file, '.enc'), 'raw', n = file.size(paste0(file, '.enc')))
@@ -164,9 +173,10 @@ kms_decrypt_file <- function(file, return = file) {
     ## decrypt the file using the encryption key
     aes <- AES(key, mode = 'ECB')
     msg <- aes$decrypt(msg, raw = TRUE)
+    msg <- base64_dec(msg)
 
     ## Base64-decode and return
-    writeBin(base64_dec(msg), return)
+    writeBin(msg, return)
 
     ## return file paths
     return

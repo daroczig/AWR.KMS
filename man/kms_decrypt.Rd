@@ -4,13 +4,15 @@
 \alias{kms_decrypt}
 \title{Decrypt cipher into plain text via KMS}
 \usage{
-kms_decrypt(cipher)
+kms_decrypt(cipher, return = c("string", "raw"))
 }
 \arguments{
 \item{cipher}{Base64-encoded ciphertext}
+
+\item{return}{return format}
 }
 \value{
-decrypted text
+decrypted text as string or raw
 }
 \description{
 Decrypt cipher into plain text via KMS
