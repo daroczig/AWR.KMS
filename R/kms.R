@@ -112,8 +112,9 @@ kms_encrypt_file <- function(key, file) {
     ## load the file to be encrypted
     msg <- readBin(file, 'raw', n = file.size(file))
     ## the text length must be a multiple of 16 bytes
-    ## https://github.com/sdoyen/r_password_crypt/blob/master/crypt.R
-    msg <- c(msg, as.raw(rep(0, 16 - length(msg) %% 16)))
+    ## so let's Base64-encode just in case
+    msg <- charToRaw(base64_enc(msg))
+    msg <- c(msg, as.raw(rep(charToRaw('='), 16 - length(msg) %% 16)))
 
     ## generate encryption key
     key <- kms_generate_data_key(key, bytes = 32L)
@@ -164,8 +165,8 @@ kms_decrypt_file <- function(file, return = file) {
     aes <- AES(key, mode = 'ECB')
     msg <- aes$decrypt(msg, raw = TRUE)
 
-    ## remove extra zeros added due to 16 bytes rule
-    writeBin(msg[msg > 0], return)
+    ## Base64-decode and return
+    writeBin(base64_dec(msg), return)
 
     ## return file paths
     return
