@@ -2,7 +2,7 @@
 % Please edit documentation in R/kms.R
 \name{retry}
 \alias{retry}
-\title{Retry the query up to 3 times on failure and if AWS reports it's a retryable error}
+\title{Retry the query up to 3 times on failure}
 \usage{
 retry(cmd, retries = 0)
 }
@@ -12,6 +12,6 @@ retry(cmd, retries = 0)
 \item{retries}{number of previous retries}
 }
 \description{
-Retry the query up to 3 times on failure and if AWS reports it's a retryable error
+Retry the query up to 3 times on failure
 }
 \keyword{internal}

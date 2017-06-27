@@ -1,4 +1,4 @@
-#' Retry the query up to 3 times on failure and if AWS reports it's a retryable error
+#' Retry the query up to 3 times on failure
 #' @param cmd expression
 #' @param retries number of previous retries
 #' @keywords internal
@@ -11,12 +11,12 @@ retry <- function(cmd, retries = 0) {
     mc <- match.call()
     if (is.null(mc$retries)) mc$retries <- 0
     mc$retries <- mc$retries + 1
-    if (mc$retries > 10) {
-        stop('Giving up')
+    if (mc$retries > 3) {
+        stop('Tried too many times, giving up')
     }
 
-    if (inherits(res, 'error') && res$isRetryable()) {
-        flog.error('Retrying query due to temporary AWS error: %s', res$message)
+    if (inherits(res, 'error')) {
+        flog.error('Retrying query due to AWS error: %s', res$message)
         Sys.sleep(2 + (mc$retries - 1) * 10)
         res <- eval(mc, envir = parent.frame())
     }
