@@ -1,14 +1,8 @@
-client <- NULL
-
-#' Initialize a KMS Client
+#' Return or init a KMS Client
 #' @keywords internal
-#' @return the KMS Client is cached within the package namespace as \code{kms_client}
-#' @note This is automatically called when the KMS Client is required and you probably will never have to run this manually, except if you have a very non-standard workflow.
-kms_init <- function() {
+kms_client <- function() {
 
-    assignInMyNamespace('client', tryCatch(
-        .jnew('com.amazonaws.services.kms.AWSKMSClientBuilder')$defaultClient(),
-        error = function(e) e))
+    client <- .jnew('com.amazonaws.services.kms.AWSKMSClientBuilder')$defaultClient()
 
     ## fail on error
     if (inherits(client, 'SdkClientException')) {
@@ -18,19 +12,7 @@ kms_init <- function() {
             client$message))
     }
 
-}
-
-
-#' Return or init a KMS Client
-#' @keywords internal
-kms_client <- function() {
-
-    ## create client on first use
-    if (is.null(client) || inherits(client, 'SdkClientException')) {
-        kms_init()
-    }
-
-    ## return already existing client
+    ## return
     invisible(client)
 
 }
