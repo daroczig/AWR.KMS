@@ -45,7 +45,9 @@ kms_encrypt <- function(key, text) {
     req$setPlaintext(J('java.nio.ByteBuffer')$wrap(.jbyte(charToRaw(as.character(text)))))
 
     ## send to AWS
-    cipher <- retry(kms_client()$encrypt(req))$getCiphertextBlob()$array()
+    client <- kms_client()
+    cipher <- retry(client$encrypt(req))$getCiphertextBlob()$array()
+    client$shutdown()
 
     ## encode and return
     base64_enc(cipher)
@@ -69,7 +71,9 @@ kms_decrypt <- function(cipher, return = c('string', 'raw')) {
     req$setCiphertextBlob(J('java.nio.ByteBuffer')$wrap(.jbyte(base64_dec(cipher))))
 
     ## send to AWS
-    res <- retry(kms_client()$decrypt(req))$getPlaintext()$array()
+    client <- kms_client()
+    res <- retry(client$decrypt(req))$getPlaintext()$array()
+    client$shutdown()
 
     ## return as requested
     if (return == 'string') {
@@ -94,7 +98,9 @@ kms_generate_data_key <- function(key, bytes = 64L) {
     req$setNumberOfBytes(.jnew('java/lang/Integer', bytes))
 
     ## send to AWS
-    res <- retry(kms_client()$generateDataKey(req))
+    client <- kms_client()
+    res <- retry(client$generateDataKey(req))
+    client$shutdown()
 
     ## return cypher + plain text
     list(
